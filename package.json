@@ -9,32 +9,41 @@
     "preview": "vite preview",
     "format": "prettier --write src/**/*.{ts,tsx,js,jsx}",
     "format:check": "prettier --check src/**/*.{ts,tsx,js,jsx}",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ci": "vitest run --coverage"
   },
   "dependencies": {
+    "axios": "^1.6.2",
+    "clsx": "^2.0.0",
+    "date-fns": "^2.30.0",
+    "lucide-react": "^0.294.0",
+    "protobufjs": "^7.2.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1",
-    "axios": "^1.6.2",
-    "protobufjs": "^7.2.5",
-    "recharts": "^2.8.0",
-    "lucide-react": "^0.294.0",
     "react-hook-form": "^7.48.2",
-    "react-query": "^3.39.3",
     "react-hot-toast": "^2.4.1",
-    "clsx": "^2.0.0",
-    "date-fns": "^2.30.0"
+    "react-query": "^3.39.3",
+    "react-router-dom": "^6.20.1",
+    "recharts": "^2.8.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@vitest/coverage-v8": "^1.6.1",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@vitejs/plugin-react": "^4.1.1",
     "autoprefixer": "^10.4.16",
+    "jsdom": "^24.0.0",
     "postcss": "^8.4.31",
     "prettier": "^3.1.0",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.2.2",
-    "vite": "^4.5.0"
+    "vite": "^5.4.0",
+    "vitest": "^1.6.1"
   },
   "keywords": [
     "react",
@@ -48,4 +57,3 @@
   "author": "Your Name",
   "license": "MIT"
 }
-
