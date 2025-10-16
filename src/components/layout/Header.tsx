@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+
 import { Shield, Bell, User } from 'lucide-react'
 
 export function Header() {
@@ -15,39 +15,8 @@ export function Header() {
               <h1 className="text-xl font-bold text-secondary-900">
                 Mini Admin Panel
               </h1>
-              <p className="text-sm text-secondary-600">
-                Professional Admin Dashboard
-              </p>
             </div>
           </div>
-
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/" 
-              className="nav-link"
-            >
-              Dashboard
-            </Link>
-            <Link 
-              to="/users" 
-              className="nav-link"
-            >
-              Users
-            </Link>
-            <Link 
-              to="/chart" 
-              className="nav-link"
-            >
-              Analytics
-            </Link>
-            <Link 
-              to="/export" 
-              className="nav-link"
-            >
-              Export
-            </Link>
-          </nav>
 
           {/* User Actions */}
           <div className="flex items-center space-x-4">

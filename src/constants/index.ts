@@ -5,6 +5,14 @@ export const API_CONFIG = {
   RETRY_ATTEMPTS: 3,
 }
 
+// API Endpoints
+export const API_ENDPOINTS = {
+  USERS: '/api/users',
+  USERS_EXPORT: '/api/users/export',
+  CRYPTO_PUBLIC_KEY: '/api/users/crypto/public-key',
+  HEALTH: '/health',
+} as const
+
 // Application Configuration
 export const APP_CONFIG = {
   NAME: 'Mini Admin Panel',

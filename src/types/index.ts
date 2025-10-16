@@ -42,11 +42,11 @@ export interface PaginatedResponse<T> {
 
 // Statistics Types
 export interface UserStats {
-  totalUsers: number
-  activeUsers: number
-  inactiveUsers: number
-  adminUsers: number
-  regularUsers: number
+  total: number
+  active: number
+  inactive: number
+  admins: number
+  users: number
 }
 
 export interface ChartData {

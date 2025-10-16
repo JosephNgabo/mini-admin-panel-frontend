@@ -4,8 +4,6 @@ import {
   Users, 
   BarChart3, 
   Download, 
-  Shield,
-  Settings 
 } from 'lucide-react'
 
 const navigation = [
@@ -13,8 +11,6 @@ const navigation = [
   { name: 'Users', href: '/users', icon: Users },
   { name: 'Analytics', href: '/chart', icon: BarChart3 },
   { name: 'Export', href: '/export', icon: Download },
-  { name: 'Security', href: '/security', icon: Shield },
-  { name: 'Settings', href: '/settings', icon: Settings },
 ]
 
 export function Sidebar() {

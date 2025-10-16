@@ -1,48 +1,89 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios'
 import { User, CreateUserData, UpdateUserData, UserStats, ChartData, PublicKeyData, ApiResponse } from '@/types'
+import { API_CONFIG, API_ENDPOINTS, ERROR_MESSAGES } from '../constants'
 
 class ApiService {
   private api: AxiosInstance
+  private requestCache = new Map<string, Promise<any>>()
 
   constructor() {
     this.api = axios.create({
-      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3025',
-      timeout: 10000,
+      baseURL: API_CONFIG.BASE_URL,
+      timeout: API_CONFIG.TIMEOUT,
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
     })
 
-    // Request interceptor
+    // Enhanced request interceptor
     this.api.interceptors.request.use(
       (config) => {
-        console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`)
+        // Add auth token if available
+        const token = localStorage.getItem('authToken')
+        if (token && config.headers) {
+          config.headers.Authorization = `Bearer ${token}`
+        }
+        
+        // Log request in development
+        if (import.meta.env.DEV) {
+          console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`)
+        }
         return config
       },
-      (error) => {
-        console.error('❌ API Request Error:', error)
+      (error: AxiosError) => {
+        console.error('❌ Request Error:', error)
         return Promise.reject(error)
       }
     )
 
-    // Response interceptor
+    // Enhanced response interceptor
     this.api.interceptors.response.use(
       (response: AxiosResponse) => {
-        console.log(`✅ API Response: ${response.status} ${response.config.url}`)
+        // Log successful response in development
+        if (import.meta.env.DEV) {
+          console.log(`✅ API Response: ${response.status} ${response.config.url}`)
+        }
         return response
       },
-      (error) => {
-        console.error('❌ API Response Error:', error.response?.status, error.response?.data)
-        return Promise.reject(error)
+      (error: AxiosError) => {
+        // Enhanced error handling
+        const errorMessage = this.getErrorMessage(error)
+        
+        if (import.meta.env.DEV) {
+          console.error('❌ API Error:', {
+            status: error.response?.status,
+            message: errorMessage,
+            url: error.config?.url,
+            data: error.response?.data,
+          })
+        }
+
+        // Handle specific error cases
+        if (error.response?.status === 401) {
+          localStorage.removeItem('authToken')
+          // Don't redirect automatically, let components handle it
+        }
+
+        return Promise.reject({
+          ...error,
+          message: errorMessage,
+          status: error.response?.status,
+        })
       }
     )
   }
 
   // User Management
-  async getUsers(): Promise<ApiResponse<User[]>> {
+  async getUsers(page = 1, limit = 10): Promise<ApiResponse<User[]>> {
     try {
-      const response = await this.api.get('/api/users')
-      return response.data
+      const response = await this.api.get(`${API_ENDPOINTS.USERS}?page=${page}&limit=${limit}`)
+      // Backend returns { data: { users: [...] } }, so we need to extract the users array
+      return {
+        success: response.data.success,
+        data: response.data.data?.users || [],
+        message: response.data.message
+      }
     } catch (error) {
       throw this.handleError(error)
     }
@@ -50,7 +91,7 @@ class ApiService {
 
   async getUserById(id: string): Promise<ApiResponse<User>> {
     try {
-      const response = await this.api.get(`/api/users/${id}`)
+      const response = await this.api.get(`${API_ENDPOINTS.USERS}/${id}`)
       return response.data
     } catch (error) {
       throw this.handleError(error)
@@ -59,7 +100,7 @@ class ApiService {
 
   async createUser(userData: CreateUserData): Promise<ApiResponse<User>> {
     try {
-      const response = await this.api.post('/api/users', userData)
+      const response = await this.api.post(API_ENDPOINTS.USERS, userData)
       return response.data
     } catch (error) {
       throw this.handleError(error)
@@ -68,7 +109,7 @@ class ApiService {
 
   async updateUser(id: string, userData: UpdateUserData): Promise<ApiResponse<User>> {
     try {
-      const response = await this.api.put(`/api/users/${id}`, userData)
+      const response = await this.api.put(`${API_ENDPOINTS.USERS}/${id}`, userData)
       return response.data
     } catch (error) {
       throw this.handleError(error)
@@ -77,7 +118,7 @@ class ApiService {
 
   async deleteUser(id: string): Promise<ApiResponse<{ message: string }>> {
     try {
-      const response = await this.api.delete(`/api/users/${id}`)
+      const response = await this.api.delete(`${API_ENDPOINTS.USERS}/${id}`)
       return response.data
     } catch (error) {
       throw this.handleError(error)
@@ -86,40 +127,67 @@ class ApiService {
 
   // Statistics
   async getUserStats(): Promise<ApiResponse<UserStats>> {
-    try {
-      const response = await this.api.get('/api/users/stats')
-      return response.data
-    } catch (error) {
-      throw this.handleError(error)
-    }
+    return this.cachedRequest('user-stats', () => 
+      this.retryRequest(async () => {
+        const response = await this.api.get(`${API_ENDPOINTS.USERS}/stats`)
+        return response.data
+      })
+    )
   }
 
-  async getChartData(): Promise<ApiResponse<ChartData[]>> {
-    try {
-      const response = await this.api.get('/api/users/chart')
-      return response.data
-    } catch (error) {
-      throw this.handleError(error)
-    }
+  async getChartData(days = 7): Promise<ApiResponse<ChartData[]>> {
+    return this.cachedRequest(`chart-data-${days}`, () => 
+      this.retryRequest(async () => {
+        const response = await this.api.get(`${API_ENDPOINTS.USERS}/chart?days=${days}`)
+        return response.data
+      })
+    )
   }
 
-  // Export
-  async exportUsers(): Promise<Blob> {
-    try {
-      const response = await this.api.get('/api/users/export', {
+  // Export - Protocol Buffer
+  async exportUsersProtobuf(): Promise<{ blob: Blob; metadata: any }> {
+    return this.retryRequest(async () => {
+      const cacheBust = `t=${Date.now()}`
+      const url = `${API_ENDPOINTS.USERS_EXPORT}?${cacheBust}`
+      const response = await this.api.get(url, {
         responseType: 'blob',
       })
+      
+      const metadata = {
+        userCount: response.headers['x-user-count'] || 0,
+        format: response.headers['x-format'] || 'protobuf',
+        size: response.headers['x-size'] || 0,
+      }
+      
+      return { blob: response.data, metadata }
+    })
+  }
+
+  // Export - JSON
+  async exportUsersJSON(): Promise<User[]> {
+    try {
+      const response = await this.api.get(API_ENDPOINTS.USERS)
+      return response.data.data || response.data
+    } catch (error) {
+      throw this.handleError(error)
+    }
+  }
+
+  // Cryptographic Features
+  async getPublicKey(): Promise<ApiResponse<PublicKeyData>> {
+    try {
+      const response = await this.api.get(API_ENDPOINTS.CRYPTO_PUBLIC_KEY)
       return response.data
     } catch (error) {
       throw this.handleError(error)
     }
   }
 
-  // Public Key
-  async getPublicKey(): Promise<ApiResponse<PublicKeyData>> {
+  async verifySignature(data: string, signature: string): Promise<boolean> {
     try {
-      const response = await this.api.get('/api/users/crypto/public-key')
-      return response.data
+      const response = await this.api.post(`${API_ENDPOINTS.USERS}/crypto/verify`, { data, signature })
+      // Explicitly return the boolean value from the response
+      return Boolean(response.data.data)
     } catch (error) {
       throw this.handleError(error)
     }
@@ -128,10 +196,39 @@ class ApiService {
   // Health Check
   async healthCheck(): Promise<ApiResponse<any>> {
     try {
-      const response = await this.api.get('/health')
+      const response = await this.api.get(API_ENDPOINTS.HEALTH)
       return response.data
     } catch (error) {
       throw this.handleError(error)
+    }
+  }
+
+  // Enhanced error message handler
+  private getErrorMessage(error: AxiosError): string {
+    if (error.response?.data && typeof error.response.data === 'object') {
+      const data = error.response.data as any
+      return data.message || data.error || ERROR_MESSAGES.SERVER_ERROR
+    }
+    
+    if (error.code === 'ECONNABORTED') {
+      return 'Request timeout. Please try again.'
+    }
+    
+    if (!error.response) {
+      return ERROR_MESSAGES.NETWORK_ERROR
+    }
+    
+    switch (error.response.status) {
+      case 400:
+        return ERROR_MESSAGES.VALIDATION_ERROR
+      case 401:
+        return ERROR_MESSAGES.UNAUTHORIZED
+      case 404:
+        return ERROR_MESSAGES.NOT_FOUND
+      case 500:
+        return ERROR_MESSAGES.SERVER_ERROR
+      default:
+        return ERROR_MESSAGES.UNKNOWN_ERROR
     }
   }
 
@@ -143,11 +240,46 @@ class ApiService {
       return new Error(`${status}: ${message}`)
     } else if (error.request) {
       // Request was made but no response received
-      return new Error('Network error: Unable to connect to server')
+      return new Error(ERROR_MESSAGES.NETWORK_ERROR)
     } else {
       // Something else happened
-      return new Error(error.message || 'Unknown error occurred')
+      return new Error(error.message || ERROR_MESSAGES.UNKNOWN_ERROR)
     }
+  }
+
+  // Retry logic for rate limiting
+  private async retryRequest<T>(requestFn: () => Promise<T>, maxRetries = 3): Promise<T> {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await requestFn()
+      } catch (error: any) {
+        if (error.response?.status === 429 && attempt < maxRetries) {
+          // Rate limited - wait with exponential backoff
+          const delay = Math.pow(2, attempt) * 1000 // 2s, 4s, 8s
+          console.log(`Rate limited, retrying in ${delay}ms... (attempt ${attempt}/${maxRetries})`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+          continue
+        }
+        throw error
+      }
+    }
+    throw new Error('Max retries exceeded')
+  }
+
+  // Cached request to prevent duplicate calls
+  private async cachedRequest<T>(key: string, requestFn: () => Promise<T>): Promise<T> {
+    if (this.requestCache.has(key)) {
+      console.log(`Using cached request for ${key}`)
+      return this.requestCache.get(key)!
+    }
+
+    const promise = requestFn().finally(() => {
+      // Remove from cache after 5 seconds
+      setTimeout(() => this.requestCache.delete(key), 5000)
+    })
+
+    this.requestCache.set(key, promise)
+    return promise
   }
 }
 
