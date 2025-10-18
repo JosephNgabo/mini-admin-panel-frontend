@@ -33,7 +33,7 @@
 
 * Fetches and decodes `/users/export` data in **Protobuf** format.
 * Efficient binary data handling using `protobuf.js`.
-* Displays verified users in a structured, easy-to-read table.
+* Displays all exported and decoded users in the table.
 ---
 
 ## ⚙️ Tech Stack
