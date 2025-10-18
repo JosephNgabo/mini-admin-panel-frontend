@@ -2,6 +2,7 @@
 ### **Mini Admin Panel — Frontend**, 
 
 ##### This is the frontend application of Mini Admin Panel,which is application for managing users(CRUD Operation), viewing analytics, handling cryptography, and exporting data.
+##### This mini admin panel also includes GitHub Actions for automated builds and CI/CD workflows.
 ---
 ###  Features Implemented
 
