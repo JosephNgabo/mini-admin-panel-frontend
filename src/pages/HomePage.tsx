@@ -68,7 +68,7 @@ export function HomePage() {
             <h3 className="text-lg font-semibold text-secondary-900">User Management</h3>
           </div>
           <p className="text-secondary-600 mb-4">
-            Complete CRUD operations for user management with role-based access control.
+            Complete CRUD operations for user management.
           </p>
           <div className="flex items-center text-sm text-success-600">
             <CheckCircle className="w-4 h-4 mr-1" />
@@ -82,7 +82,7 @@ export function HomePage() {
             <h3 className="text-lg font-semibold text-secondary-900">Analytics</h3>
           </div>
           <p className="text-secondary-600 mb-4">
-            Visualize user creation trends with interactive charts and statistics.
+            Visualize user creation trends with interactive charts over 7 days.
           </p>
           <div className="flex items-center text-sm text-success-600">
             <CheckCircle className="w-4 h-4 mr-1" />
