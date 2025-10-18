@@ -25,7 +25,7 @@
 
 * Email hashes generated with **SHA-384**.
 * Each user is digitally signed using **RSA-2048** keypair.
-* Frontend validates signatures before displaying user data using **Web Crypto API**.
+* Frontend validates signatures before displaying user data in the table.
 * Only users with validated signatures are listed in the table.
 ---
 
