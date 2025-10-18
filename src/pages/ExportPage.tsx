@@ -133,7 +133,7 @@ export function ExportPage() {
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-secondary-900">Data Export</h1>
-        <p className="text-secondary-600">Export user data in Protocol Buffer format with cryptographic verification</p>
+        <p className="text-secondary-600">Decode, View and Export user data in Protocol Buffer format with cryptographic verification</p>
       </div>
 
       {/* Export Options */}
@@ -157,28 +157,12 @@ export function ExportPage() {
               <span className="text-sm text-secondary-700">Binary Protocol Buffer Format</span>
             </div>
             <div className="space-y-3">
-              <button 
-                onClick={handleProtobufExport}
-                disabled={isExporting}
-                className="btn-primary w-full flex items-center justify-center space-x-2"
-              >
-                {isExporting ? (
-                  <>
-                    <div className="loading-spinner" />
-                    <span>Exporting...</span>
-                  </>
-                ) : (
-                  <>
-                    <Database className="w-4 h-4" />
-                    <span>Export as Protocol Buffer</span>
-                  </>
-                )}
-              </button>
+              
               
               <button 
                 onClick={handleProtobufDecode}
                 disabled={isExporting}
-                className="btn-outline w-full flex items-center justify-center space-x-2"
+                className="btn-primary w-full flex items-center justify-center space-x-2"
               >
                 {isExporting ? (
                   <>
@@ -189,6 +173,24 @@ export function ExportPage() {
                   <>
                     <Eye className="w-4 h-4" />
                     <span>Decode & Display Protocol Buffer</span>
+                  </>
+                )}
+              </button>
+
+<button 
+                onClick={handleProtobufExport}
+                disabled={isExporting}
+                className="btn-outline w-full flex items-center justify-center space-x-2"
+              >
+                {isExporting ? (
+                  <>
+                    <div className="loading-spinner" />
+                    <span>Exporting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Database className="w-4 h-4" />
+                    <span>Export as Protocol Buffer</span>
                   </>
                 )}
               </button>
@@ -429,7 +431,7 @@ export function ExportPage() {
                     <th>Role</th>
                     <th>Status</th>
                     <th>Created</th>
-                    <th>Hash</th>
+                    <th>Hash (Email)</th>
                     <th>Signature</th>
                   </tr>
                 </thead>

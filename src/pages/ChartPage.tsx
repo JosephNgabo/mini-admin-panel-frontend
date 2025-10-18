@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { format } from 'date-fns'
 import { BarChart3, TrendingUp, Users, Calendar, AlertCircle, RefreshCw } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { apiService } from '../services/api'
@@ -28,11 +29,13 @@ export function ChartPage() {
       
       setStats(statsResponse.data || null)
       console.log('Stats data received:', statsResponse.data)
-      // Transform chart data to match expected format
-      const transformedChartData = (chartResponse.data || []).map((item: any) => ({
-        date: item.date,
-        users: typeof item.count === 'string' ? parseInt(item.count, 10) : item.count || 0
-      }))
+      // Transform chart data to match expected format and normalize date to local day
+      const transformedChartData = (chartResponse.data || []).map((item: any) => {
+        const parsed = new Date(item.date)
+        const localDate = isNaN(parsed.getTime()) ? String(item.date) : format(parsed, 'yyyy-MM-dd')
+        const usersCount = typeof item.count === 'string' ? parseInt(item.count, 10) : item.count || 0
+        return { date: localDate, users: usersCount }
+      })
       console.log('Chart data received:', chartResponse.data)
       console.log('Transformed chart data:', transformedChartData)
       setChartData(transformedChartData)
@@ -63,7 +66,7 @@ export function ChartPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-secondary-900">Analytics Dashboard</h1>
-          <p className="text-secondary-600">User creation trends and system statistics</p>
+          <p className="text-secondary-600">User creation details in past 7 days and user distribution by role and status</p>
         </div>
         <button 
           onClick={loadAnalyticsData}

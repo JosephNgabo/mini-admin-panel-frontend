@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios'
-import { User, CreateUserData, UpdateUserData, UserStats, ChartData, PublicKeyData, ApiResponse } from '@/types'
+import { User, CreateUserData, UpdateUserData, UserStats, ChartData, PublicKeyData, ApiResponse, PaginatedResponse } from '@/types'
 import { API_CONFIG, API_ENDPOINTS, ERROR_MESSAGES } from '../constants'
 
 class ApiService {
@@ -78,11 +78,44 @@ class ApiService {
   async getUsers(page = 1, limit = 10): Promise<ApiResponse<User[]>> {
     try {
       const response = await this.api.get(`${API_ENDPOINTS.USERS}?page=${page}&limit=${limit}`)
-      // Backend returns { data: { users: [...] } }, so we need to extract the users array
+      // Fallback simple shape for legacy callers
       return {
         success: response.data.success,
         data: response.data.data?.users || [],
         message: response.data.message
+      }
+    } catch (error) {
+      throw this.handleError(error)
+    }
+  }
+
+  // Paginated Users (with metadata)
+  async getUsersPaginated(page = 1, limit = 10): Promise<PaginatedResponse<User>> {
+    try {
+      const response = await this.api.get(`${API_ENDPOINTS.USERS}?page=${page}&limit=${limit}`)
+      const users = response.data?.data?.users || response.data?.data || []
+      const apiMeta = response.data?.data?.pagination || response.data?.pagination
+      const pagination = apiMeta
+        ? {
+            page: Number(apiMeta.page ?? page),
+            limit: Number(apiMeta.limit ?? limit),
+            total: Number(apiMeta.total ?? apiMeta.totalCount ?? (Array.isArray(users) ? users.length : 0)),
+            totalPages: Number(apiMeta.totalPages ?? 1),
+            hasNextPage: Boolean(apiMeta.hasNextPage ?? (Number(apiMeta.page ?? page) < Number(apiMeta.totalPages ?? 1))),
+            hasPrevPage: Boolean(apiMeta.hasPrevPage ?? (Number(apiMeta.page ?? page) > 1)),
+          }
+        : {
+            page,
+            limit,
+            total: Array.isArray(users) ? users.length : 0,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPrevPage: false,
+          }
+      return {
+        success: Boolean(response.data?.success ?? true),
+        data: users,
+        pagination,
       }
     } catch (error) {
       throw this.handleError(error)
