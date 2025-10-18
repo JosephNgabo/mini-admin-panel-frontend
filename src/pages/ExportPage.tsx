@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Download, Shield, FileText, CheckCircle, AlertCircle, Database, Users, Eye } from 'lucide-react'
+import { Download, Shield, FileText, CheckCircle, AlertCircle, Database, Eye } from 'lucide-react'
 import { apiService } from '../services/api'
 import { protobufService } from '../services/protobuf'
 import { User } from '../types'
@@ -9,7 +9,6 @@ export function ExportPage() {
   const [isExporting, setIsExporting] = useState(false)
   const [exportStatus, setExportStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [exportedUsers, setExportedUsers] = useState<User[]>([])
-  const [exportMetadata, setExportMetadata] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
   const [publicKey, setPublicKey] = useState<string | null>(null)
   const [protobufUsers, setProtobufUsers] = useState<User[]>([])
@@ -35,8 +34,7 @@ export function ExportPage() {
     setError(null)
     
     try {
-      const { blob, metadata } = await apiService.exportUsersProtobuf()
-      setExportMetadata(metadata)
+      const { blob } = await apiService.exportUsersProtobuf()
       
       // Create download link
       const url = window.URL.createObjectURL(blob)
@@ -309,32 +307,6 @@ export function ExportPage() {
         </div>
       )}
 
-      {/* Export Metadata */}
-      {exportMetadata && (
-        <div className="card">
-          <div className="card-header">
-            <h3 className="card-title">Export Details</h3>
-            <p className="card-subtitle">Protocol Buffer export information</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-primary-50 rounded-lg">
-              <Users className="w-8 h-8 mx-auto mb-2 text-primary-600" />
-              <div className="text-2xl font-bold text-primary-900">{exportMetadata.userCount}</div>
-              <div className="text-sm text-primary-600">Users Exported</div>
-            </div>
-            <div className="text-center p-4 bg-secondary-50 rounded-lg">
-              <Database className="w-8 h-8 mx-auto mb-2 text-secondary-600" />
-              <div className="text-2xl font-bold text-secondary-900">{exportMetadata.format}</div>
-              <div className="text-sm text-secondary-600">Format</div>
-            </div>
-            <div className="text-center p-4 bg-success-50 rounded-lg">
-              <FileText className="w-8 h-8 mx-auto mb-2 text-success-600" />
-              <div className="text-2xl font-bold text-success-900">{Math.round(exportMetadata.size / 1024)}KB</div>
-              <div className="text-sm text-success-600">File Size</div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Exported Users Table */}
       {exportedUsers.length > 0 && (
