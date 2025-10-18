@@ -29,14 +29,14 @@
 * Only users with validated signatures are listed in the table.
 ---
 
-### 🧾 **4. Protocol Buffer Integration**
+### **4. Protocol Buffer Integration**
 
 * Fetches and decodes `/users/export` data in **Protobuf** format.
 * Efficient binary data handling using `protobuf.js`.
-* Displays all exported and decoded users in the table.
+* List in a table all exported and decoded users.
 ---
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 | Category               | Technology                     |
 | ---------------------- | ------------------------------ |
@@ -49,7 +49,7 @@
 | **Backend Database**   | PostgreSQL                     |
 | **Containerization**   | Docker, Docker Compose         |
 ---
-## 🖼️ Screenshots
+## Screenshots
 
 | Section                           | Preview                    |
 | --------------------------------- | -------------------------- |
