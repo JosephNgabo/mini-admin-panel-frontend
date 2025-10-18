@@ -261,10 +261,6 @@ export function ExportPage() {
                 <span className="font-medium">SHA-384</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-secondary-600">Output Size:</span>
-                <span className="font-medium">384 bits</span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-secondary-600">Security Level:</span>
                 <span className="font-medium text-success-600">High</span>
               </div>
@@ -273,10 +269,6 @@ export function ExportPage() {
           <div>
             <h4 className="font-semibold text-secondary-900 mb-3">Digital Signature</h4>
             <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-secondary-600">Algorithm:</span>
-                <span className="font-medium">RSA-2048</span>
-              </div>
               <div className="flex justify-between">
                 <span className="text-secondary-600">Key Size:</span>
                 <span className="font-medium">2048 bits</span>
