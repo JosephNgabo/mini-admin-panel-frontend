@@ -1,9 +1,9 @@
 
 ### **Mini Admin Panel — Frontend**, 
 
-##### This is the frontend application of Mini Admin Panel,which is application for managing users, viewing analytics, handling cryptography, and exporting data.
+##### This is the frontend application of Mini Admin Panel,which is application for managing users(CRUD Operation), viewing analytics, handling cryptography, and exporting data.
 ---
-###  Features Implented
+###  Features Implemented
 
 ###  **1. User Management**
 
