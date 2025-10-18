@@ -123,6 +123,18 @@ environment:
 ---
 
 
+## Notes / Assumptions
+
+- The frontend is built with React + Vite + TailwindCSS and communicates with the backend via REST API.
+- The backend URL is configured using the environment variable `VITE_API_URL`.
+- Crypto signature verification is performed before displaying users in the table; users with invalid signatures are not displayed in table.
+- Protocol Buffers are used to fetch and decode user data from `/api/users/export`.
+- Docker and Docker Compose are used for local development; the frontend runs on port `3000` by default.
+- A `docker-compose.yml` file is included in the backend root folder to easily spin up the backend, frontend, and PostgreSQL database together.
+- GitHub Actions are included for CI (linting, type-checks, and tests).
+
+
+
 ##  Author
 
 **Joseph Ntwali**
