@@ -1,5 +1,5 @@
 
-import { Shield, Bell, User } from 'lucide-react'
+import { Shield } from 'lucide-react'
 
 export function Header() {
   return (
@@ -16,16 +16,6 @@ export function Header() {
                 Mini Admin Panel
               </h1>
             </div>
-          </div>
-
-          {/* User Actions */}
-          <div className="flex items-center space-x-4">
-            <button className="p-2 text-secondary-600 hover:text-primary-900 transition-colors">
-              <Bell className="w-5 h-5" />
-            </button>
-            <button className="p-2 text-secondary-600 hover:text-primary-900 transition-colors">
-              <User className="w-5 h-5" />
-            </button>
           </div>
         </div>
       </div>

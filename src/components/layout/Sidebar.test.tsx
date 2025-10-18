@@ -13,7 +13,6 @@ describe('Sidebar', () => {
     expect(screen.getByText(/Dashboard/i)).toBeInTheDocument()
     expect(screen.getByText(/Users/i)).toBeInTheDocument()
     expect(screen.getByText(/Analytics/i)).toBeInTheDocument()
-    expect(screen.getByText(/Export/i)).toBeInTheDocument()
   })
 })
 

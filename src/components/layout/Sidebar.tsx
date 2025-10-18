@@ -10,7 +10,7 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
   { name: 'Users', href: '/users', icon: Users },
   { name: 'Analytics', href: '/chart', icon: BarChart3 },
-  { name: 'Export', href: '/export', icon: Download },
+  { name: 'Protocol Buffer', href: '/export', icon: Download },
 ]
 
 export function Sidebar() {
