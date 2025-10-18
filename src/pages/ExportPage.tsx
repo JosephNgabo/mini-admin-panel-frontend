@@ -132,7 +132,7 @@ export function ExportPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-secondary-900">Data Export</h1>
+        <h1 className="text-2xl font-bold text-secondary-900">Data Decode, View and Export</h1>
         <p className="text-secondary-600">Decode, View and Export user data in Protocol Buffer format with cryptographic verification</p>
       </div>
 
