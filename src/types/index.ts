@@ -37,6 +37,8 @@ export interface PaginatedResponse<T> {
     limit: number
     total: number
     totalPages: number
+    hasNextPage?: boolean
+    hasPrevPage?: boolean
   }
 }
 

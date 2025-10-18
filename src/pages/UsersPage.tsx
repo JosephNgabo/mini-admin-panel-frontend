@@ -13,6 +13,13 @@ export function UsersPage() {
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
+  const [showFilters, setShowFilters] = useState(false)
+  const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'user'>('all')
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
+  const [totalItems, setTotalItems] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
 
   // Form state
   const [formData, setFormData] = useState<CreateUserData>({
@@ -26,17 +33,24 @@ export function UsersPage() {
     loadUsers()
   }, [])
 
-  // Load users from API
+  // Load users from API (server-side pagination)
   const loadUsers = async () => {
     try {
       setLoading(LOADING_STATES.LOADING)
       setError(null)
-      const response = await apiService.getUsers()
-      const allUsers = response.data || []
-      
-      // Verify signatures before displaying users
+      const { data: pagedUsers, pagination } = await apiService.getUsersPaginated(currentPage, pageSize)
+      const allUsers = pagedUsers || []
+
+      // Verify signatures before displaying users (do not change pagination counts)
       const verifiedUsers = await verifyUserSignatures(allUsers)
       setUsers(verifiedUsers)
+      if (pagination) {
+        setTotalItems(pagination.total ?? verifiedUsers.length)
+        setTotalPages(pagination.totalPages ?? Math.max(1, Math.ceil((pagination.total ?? verifiedUsers.length) / pageSize)))
+      } else {
+        setTotalItems(verifiedUsers.length)
+        setTotalPages(1)
+      }
       setLoading(LOADING_STATES.SUCCESS)
     } catch (err: any) {
       setError(err.message || ERROR_MESSAGES.UNKNOWN_ERROR)
@@ -126,11 +140,33 @@ export function UsersPage() {
   }
 
   // Filter users based on search term
-  const filteredUsers = (users || []).filter(user =>
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.status.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredUsers = (users || [])
+    .filter(user => {
+      const term = searchTerm.toLowerCase()
+      if (!term) return true
+      return (
+        user.email.toLowerCase().includes(term) ||
+        user.role.toLowerCase().includes(term) ||
+        user.status.toLowerCase().includes(term)
+      )
+    })
+    .filter(user => (filterRole === 'all' ? true : user.role === filterRole))
+    .filter(user => (filterStatus === 'all' ? true : user.status === filterStatus))
+
+  const safeCurrentPage = Math.min(currentPage, totalPages)
+  const startIndex = (safeCurrentPage - 1) * pageSize
+  const endIndex = Math.min(startIndex + pageSize, totalItems)
+  const visibleUsers = filteredUsers
+
+  useEffect(() => {
+    // Reset to first page when filters/search change
+    setCurrentPage(1)
+  }, [searchTerm, filterRole, filterStatus])
+
+  useEffect(() => {
+    // On page change, fetch server data
+    loadUsers()
+  }, [currentPage])
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -161,7 +197,7 @@ export function UsersPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-secondary-900">User Management</h1>
-          <p className="text-secondary-600">Manage users, roles, and permissions</p>
+          <p className="text-secondary-600">Manage CRUD(Create, Read, Update, Delete) operations for users</p>
         </div>
         <button 
           onClick={() => setShowCreateForm(true)}
@@ -192,23 +228,68 @@ export function UsersPage() {
 
       {/* Filters */}
       <div className="card">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-field pl-10"
-              />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="input-field pl-10"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                className="btn-outline flex items-center space-x-2"
+                onClick={() => setShowFilters(v => !v)}
+                aria-expanded={showFilters}
+                aria-controls="user-filters"
+              >
+                <Filter className="w-4 h-4" />
+                <span>Filters</span>
+              </button>
+              {(filterRole !== 'all' || filterStatus !== 'all' || searchTerm) && (
+                <button
+                  className="btn-secondary"
+                  onClick={() => { setSearchTerm(''); setFilterRole('all'); setFilterStatus('all') }}
+                >
+                  Clear
+                </button>
+              )}
             </div>
           </div>
-          <button className="btn-outline flex items-center space-x-2">
-            <Filter className="w-4 h-4" />
-            <span>Filters</span>
-          </button>
+          {showFilters && (
+            <div id="user-filters" className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Role</label>
+                <select
+                  value={filterRole}
+                  onChange={(e) => setFilterRole(e.target.value as 'all' | 'admin' | 'user')}
+                  className="input-field w-full"
+                >
+                  <option value="all">All</option>
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Status</label>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value as 'all' | 'active' | 'inactive')}
+                  className="input-field w-full"
+                >
+                  <option value="all">All</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -242,7 +323,7 @@ export function UsersPage() {
                   </td>
                 </tr>
               ) : (
-                filteredUsers.map((user) => (
+                visibleUsers.map((user) => (
                   <tr key={user.id}>
                     <td>
                       <div className="flex items-center space-x-3">
@@ -315,6 +396,45 @@ export function UsersPage() {
               )}
             </tbody>
           </table>
+        </div>
+        {/* Pagination */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+          <div className="text-sm text-secondary-600">
+            Page {safeCurrentPage} of {totalPages} · Showing {totalItems === 0 ? 0 : startIndex + 1}-{endIndex} of {totalItems}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Previous page"
+              className={`btn-outline px-3 py-1 ${safeCurrentPage <= 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={() => { if (safeCurrentPage > 1) setCurrentPage(safeCurrentPage - 1) }}
+              disabled={safeCurrentPage <= 1}
+            >
+              Prev
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                type="button"
+                aria-label={`Go to page ${page}`}
+                aria-current={page === safeCurrentPage ? 'page' : undefined}
+                disabled={page === safeCurrentPage}
+                key={page}
+                onClick={() => page !== safeCurrentPage && setCurrentPage(page)}
+                className={`px-3 py-1 rounded border ${page === safeCurrentPage ? 'bg-primary-900 text-white border-primary-900 cursor-default' : 'border-secondary-200 text-secondary-700 hover:bg-secondary-100'}`}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              type="button"
+              aria-label="Next page"
+              className={`btn-outline px-3 py-1 ${safeCurrentPage >= totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={() => { if (safeCurrentPage < totalPages) setCurrentPage(safeCurrentPage + 1) }}
+              disabled={safeCurrentPage >= totalPages}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
 
