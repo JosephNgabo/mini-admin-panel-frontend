@@ -69,7 +69,7 @@
 
 ### Clone the repository
 ```bash
-git clone (https://github.com/JosephNgabo/mini-admin-panel-frontend.git)
+git clone https://github.com/JosephNgabo/mini-admin-panel-frontend.git
 cd mini-admin-panel-frontend
 ```
 ### Install dependencies
