@@ -3,7 +3,7 @@ import { Download, Shield, FileText, CheckCircle, AlertCircle, Database, Eye } f
 import { apiService } from '../services/api'
 import { protobufService } from '../services/protobuf'
 import { User } from '../types'
-import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '../constants'
+import { ERROR_MESSAGES } from '../constants'
 
 export function ExportPage() {
   const [isExporting, setIsExporting] = useState(false)
@@ -47,7 +47,6 @@ export function ExportPage() {
       window.URL.revokeObjectURL(url)
       
       setExportStatus('success')
-      console.log(SUCCESS_MESSAGES.DATA_EXPORTED)
     } catch (err: any) {
       setError(err.message || ERROR_MESSAGES.UNKNOWN_ERROR)
       setExportStatus('error')
@@ -81,10 +80,6 @@ export function ExportPage() {
       })
       setShowProtobufTable(true)
       
-      console.log('✅ Protocol Buffer decoded successfully', {
-        userCount: decodedData.users.length,
-        metadata: decodedData
-      })
       
     } catch (err: any) {
       setError(err.message || ERROR_MESSAGES.UNKNOWN_ERROR)
@@ -116,7 +111,6 @@ export function ExportPage() {
       window.URL.revokeObjectURL(url)
       
       setExportStatus('success')
-      console.log(SUCCESS_MESSAGES.DATA_EXPORTED)
     } catch (err: any) {
       setError(err.message || ERROR_MESSAGES.UNKNOWN_ERROR)
       setExportStatus('error')

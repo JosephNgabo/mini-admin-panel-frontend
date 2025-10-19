@@ -28,7 +28,6 @@ export function ChartPage() {
       ])
       
       setStats(statsResponse.data || null)
-      console.log('Stats data received:', statsResponse.data)
       // Transform chart data to match expected format and normalize date to local day
       const transformedChartData = (chartResponse.data || []).map((item: any) => {
         const parsed = new Date(item.date)
@@ -36,8 +35,6 @@ export function ChartPage() {
         const usersCount = typeof item.count === 'string' ? parseInt(item.count, 10) : item.count || 0
         return { date: localDate, users: usersCount }
       })
-      console.log('Chart data received:', chartResponse.data)
-      console.log('Transformed chart data:', transformedChartData)
       setChartData(transformedChartData)
       setLoading(LOADING_STATES.SUCCESS)
     } catch (err: any) {

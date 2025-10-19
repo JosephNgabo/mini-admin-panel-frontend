@@ -17,7 +17,7 @@ export default {
           600: '#16a34a',
           700: '#15803d',
           800: '#166534',
-          900: '#002b11', // Your custom color
+          900: '#002b11', 
           950: '#001a0a',
         },
         secondary: {

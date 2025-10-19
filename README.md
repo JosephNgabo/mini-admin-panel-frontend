@@ -1,159 +1,142 @@
-# Mini Admin Panel Frontend
 
-A professional React frontend for the Mini Admin Panel built with TypeScript, Vite, and Tailwind CSS.
+### **Mini Admin Panel — Frontend**, 
 
-## 🚀 Features
+##### This is the frontend application of Mini Admin Panel,which is application for managing users(CRUD Operation), viewing analytics, handling cryptography, and exporting data.
+##### This mini admin panel also includes GitHub Actions for automated builds and CI/CD workflows.
+---
+###  Features Implemented
 
-- **Modern React Architecture** - Built with React 18 and TypeScript
-- **Professional UI/UX** - Custom design system with Tailwind CSS
-- **User Management** - Complete CRUD operations with role-based access
-- **Analytics Dashboard** - Interactive charts and statistics
-- **Cryptographic Security** - SHA-384 hashing and RSA digital signatures
-- **Protocol Buffer Integration** - Binary data export and verification
-- **Responsive Design** - Mobile-first approach with modern layouts
+###  **1. User Management**
 
-## 🎨 Design System
+* Create, update, delete, and list users.
+* Displays user **status**, **creation date**, and **email**.
+* Backend integration with **PostgreSQL** for data persistence.
 
-- **Primary Color**: #002b11 (Custom green)
-- **Typography**: Inter font family
-- **Components**: Tailwind CSS with custom component classes
-- **Icons**: Lucide React for consistent iconography
-- **Animations**: Smooth transitions and loading states
+---
 
-## 🛠️ Tech Stack
+### **2. Analytics**
 
-- **Framework**: React 18 with TypeScript
-- **Build Tool**: Vite for fast development and building
-- **Styling**: Tailwind CSS with custom configuration
-- **Routing**: React Router DOM for navigation
-- **State Management**: React Query for server state
-- **Forms**: React Hook Form for form handling
-- **Charts**: Recharts for data visualization
-- **Protocol Buffers**: protobufjs for binary data handling
-- **Notifications**: React Hot Toast for user feedback
+* Interactive chart visualizing **user creation trends** over the last 7 days.
+* Built with **Recharts** and **React Query** for real-time updates.
+* Dynamic insights into user growth and engagement.
 
-## 📦 Installation
+---
+
+### **3. Cryptography**
+
+* Email hashes generated with **SHA-384**.
+* Each user is digitally signed using **RSA-2048** keypair.
+* Frontend validates signatures before displaying user data in the table.
+* Only users with validated signatures are listed in the table.
+---
+
+### **4. Protocol Buffer Integration**
+
+* Fetches and decodes `/users/export` data in **Protobuf** format.
+* Efficient binary data handling using `protobuf.js`.
+* List in a table all exported and decoded users.
+---
+
+## Tech Stack
+
+| Category               | Technology                     |
+| ---------------------- | ------------------------------ |
+| **Frontend Framework** | React + TypeScript + Vite      |
+| **UI Library**         | Tailwind CSS                   |
+| **State & Data**       | React Query, Axios             |
+| **Charting**           | Recharts                       |
+| **Data Serialization** | Protocol Buffers (protobuf.js) |
+| **Crypto Algorithms**  | SHA-384, RSA-2048              |
+| **Backend Database**   | PostgreSQL                     |
+| **Containerization**   | Docker, Docker Compose         |
+---
+## Screenshots
+
+| Section                           | Preview                    |
+| --------------------------------- | -------------------------- |
+| **Dashboard Overview**            |<img width="1512" height="823" alt="Screenshot 2025-10-18 at 16 37 27" src="https://github.com/user-attachments/assets/5df014ec-645f-49c1-aab6-efb66ad259b2" /> |
+| **User Management (CRUD)**        | <img width="1512" height="821" alt="Screenshot 2025-10-18 at 16 39 05" src="https://github.com/user-attachments/assets/d4f4cede-49ea-48d3-ab5b-56ffcb9001ec" />
+**Analytics (User Charts)**        | <img width="1512" height="823" alt="Screenshot 2025-10-18 at 16 42 04" src="https://github.com/user-attachments/assets/492eae2e-8d64-42b3-9cd7-ceb22983a330" />
+| **Protobuf Data Export**          | <img width="1490" height="775" alt="Screenshot 2025-10-18 at 16 48 51" src="https://github.com/user-attachments/assets/50f39d19-1358-4b06-b454-cbe8c2133db7" />
+ **List Protocol Buffer Decoded Users** |<img width="1512" height="712" alt="Screenshot 2025-10-18 at 16 49 49" src="https://github.com/user-attachments/assets/9e0c40ec-dfba-4e08-b3b4-3b33c36112d5" />
+---
+## Installation
+
+### Prerequisites
+
+* Node.js 18+
+* npm (or yarn)
+
+### Clone the repository
+```bash
+git clone https://github.com/JosephNgabo/mini-admin-panel-frontend.git
+cd mini-admin-panel-frontend
+```
+### Install dependencies
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
+```
+---
 
-# Build for production
-npm run build
+## 🧭 Steps to Run Locally
 
-# Preview production build
-npm run preview
+### 1. Start the backend
+
+Ensure your backend (Node.js/Express + PostgreSQL) is running:
+
+```bash
+http://localhost:3026
 ```
 
-## 🔧 Configuration
+### 2. Start the frontend
 
-1. **Environment Variables**: Create `.env.local` file with your API URL
-2. **Backend Connection**: Ensure backend is running on port 3025
-3. **Database**: Backend should be connected to PostgreSQL
-
-## 📁 Project Structure
-
-```
-src/
-├── components/         # Reusable React components
-│   ├── layout/        # Layout components (Header, Sidebar, Layout)
-│   ├── ui/            # UI components (buttons, forms, tables)
-│   ├── forms/         # Form components
-│   └── charts/        # Chart components
-├── pages/             # Page components
-│   ├── HomePage.tsx   # Dashboard home page
-│   ├── UsersPage.tsx  # User management page
-│   ├── ChartPage.tsx  # Analytics dashboard
-│   └── ExportPage.tsx # Data export page
-├── services/          # API service layer
-│   └── api.ts         # API client with axios
-├── hooks/             # Custom React hooks
-├── utils/             # Utility functions
-├── types/             # TypeScript type definitions
-├── constants/         # Application constants
-└── contexts/          # React contexts for state management
+```bash
+npm run dev
 ```
 
-## 🚀 Getting Started
+### 3. Access the app
 
-1. **Start Backend**: Ensure the Node.js backend is running
-2. **Install Dependencies**: `npm install`
-3. **Start Development**: `npm run dev`
-4. **Open Browser**: Navigate to `http://localhost:3000`
+Visit:
 
-## 🔐 Security Features
+```
+http://localhost:3000
+```
+---
 
-- **Email Hashing**: SHA-384 algorithm for user emails
-- **Digital Signatures**: RSA-2048 for data integrity
-- **Signature Verification**: Client-side validation
-- **Secure API**: HTTPS and CORS configuration
+## 🐳 Docker Setup
 
-## 📊 Protocol Buffer Integration
+### Build and run the container
 
-- **Binary Export**: Efficient data serialization
-- **Client Decoding**: Parse protobuf data in browser
-- **Signature Verification**: Validate exported data integrity
-- **Performance**: Optimized for large datasets
+```bash
+docker build -t mini-admin-frontend .
+docker run -d -p 3000:80 mini-admin-frontend
+```
 
-## 🎯 Development
+If using `docker-compose` with backend and database:
 
-- **Type Safety**: Full TypeScript coverage
-- **Code Quality**: ESLint and Prettier configured
-- **Performance**: Optimized bundle size with Vite
-- **Accessibility**: WCAG compliant components
-- **Testing**: Jest and React Testing Library ready
+```yaml
+environment:
+  - VITE_API_URL=http://mini-admin-backend:3026
+```
+---
 
-## 📱 Responsive Design
 
-- **Mobile First**: Optimized for all screen sizes
-- **Touch Friendly**: Gesture support for mobile
-- **Progressive Enhancement**: Works without JavaScript
-- **Cross Browser**: Compatible with all modern browsers
+## Notes / Assumptions
 
-## 🔄 State Management
+- The frontend is built with React + Vite + TailwindCSS and communicates with the backend via REST API.
+- The backend URL is configured using the environment variable `VITE_API_URL`.
+- Crypto signature verification is performed before displaying users in the table; users with invalid signatures are not displayed in table.
+- Protocol Buffers are used to fetch and decode user data from `/api/users/export`.
+- Docker and Docker Compose are used for local development; the frontend runs on port `3000` by default.
+- A `docker-compose.yml` file is included in the backend root folder to easily spin up the backend, frontend, and PostgreSQL database together.
+- GitHub Actions are included for CI (linting, type-checks, and tests).
 
-- **Server State**: React Query for API data
-- **Local State**: React hooks for component state
-- **Form State**: React Hook Form for form management
-- **Global State**: React Context for app-wide state
 
-## 🎨 Custom Components
 
-- **Button Variants**: Primary, secondary, success, error, outline
-- **Card Components**: Standardized card layouts
-- **Form Components**: Input fields with validation
-- **Table Components**: Sortable and filterable tables
-- **Loading States**: Skeleton loaders and spinners
-- **Status Badges**: Success, error, warning, secondary
+##  Author
 
-## 📈 Performance
+**Joseph Ntwali**
 
-- **Code Splitting**: Automatic route-based splitting
-- **Lazy Loading**: Components loaded on demand
-- **Bundle Optimization**: Tree shaking and minification
-- **Caching**: React Query for intelligent caching
-- **Image Optimization**: Responsive images and lazy loading
-
-## 🧪 Testing
-
-- **Unit Tests**: Component and utility testing
-- **Integration Tests**: API integration testing
-- **E2E Tests**: End-to-end user journey testing
-- **Visual Tests**: Component visual regression testing
-
-## 🚀 Deployment
-
-- **Build**: `npm run build` creates optimized production bundle
-- **Preview**: `npm run preview` to test production build locally
-- **Static Hosting**: Deploy to Vercel, Netlify, or any static host
-- **CDN**: Optimized for CDN delivery
-
-## 📚 Documentation
-
-- **Component Docs**: Storybook for component documentation
-- **API Docs**: Swagger/OpenAPI integration
-- **Type Docs**: TypeScript documentation
-- **User Guide**: Comprehensive user documentation
+Mini Admin Panel — Frontend Implementation

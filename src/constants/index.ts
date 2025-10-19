@@ -17,7 +17,7 @@ export const API_ENDPOINTS = {
 export const APP_CONFIG = {
   NAME: 'Mini Admin Panel',
   VERSION: '1.0.0',
-  DESCRIPTION: 'Professional admin panel with user management, analytics, and cryptographic features',
+  DESCRIPTION: 'Mini Admin Panel with user management, analytics, and cryptographic features',
 }
 
 // User Roles

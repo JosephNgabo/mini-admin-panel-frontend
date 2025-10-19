@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Plus, Search, Filter, Edit, Trash2, AlertCircle, Shield, CheckCircle } from 'lucide-react'
 import { apiService } from '../services/api'
 import { User, CreateUserData, UpdateUserData } from '../types'
-import { LOADING_STATES, SUCCESS_MESSAGES, ERROR_MESSAGES } from '../constants'
+import { LOADING_STATES, ERROR_MESSAGES } from '../constants'
 
 export function UsersPage() {
   // State management
@@ -70,17 +70,13 @@ export function UsersPage() {
           const isValid = await apiService.verifySignature(user.email_hash, user.signature)
           if (isValid) {
             verifiedUsers.push(user)
-            console.log(`✅ User ${user.email} signature verified`)
           } else {
-            console.warn(`❌ User ${user.email} signature verification failed - excluding from display`)
-            // Don't add users with invalid signatures to verifiedUsers
           }
         } else {
-          console.warn(`⚠️ User ${user.email} missing cryptographic data - excluding from display`)
-          // Don't add users without cryptographic data to verifiedUsers
+          console.warn(`User ${user.email} missing cryptographic data - excluding from display`)
         }
       } catch (error) {
-        console.error(`❌ Error verifying signature for user ${user.email}:`, error)
+        console.error(`Error verifying signature for user ${user.email}:`, error)
       }
     }
     
@@ -97,8 +93,7 @@ export function UsersPage() {
       setShowCreateForm(false)
       setFormData({ email: '', role: 'user', status: 'active' })
       setLoading(LOADING_STATES.SUCCESS)
-      // Show success message (you can implement toast notifications here)
-      console.log(SUCCESS_MESSAGES.USER_CREATED)
+      
     } catch (err: any) {
       setError(err.message || ERROR_MESSAGES.UNKNOWN_ERROR)
       setLoading(LOADING_STATES.ERROR)
@@ -114,7 +109,6 @@ export function UsersPage() {
       await loadUsers() // Refresh the list
       setEditingUser(null)
       setLoading(LOADING_STATES.SUCCESS)
-      console.log(SUCCESS_MESSAGES.USER_UPDATED)
     } catch (err: any) {
       setError(err.message || ERROR_MESSAGES.UNKNOWN_ERROR)
       setLoading(LOADING_STATES.ERROR)
@@ -131,7 +125,6 @@ export function UsersPage() {
       await apiService.deleteUser(id)
       await loadUsers() // Refresh the list
       setDeletingUserId(null)
-      console.log(SUCCESS_MESSAGES.USER_DELETED)
     } catch (err: any) {
       setError(err.message || ERROR_MESSAGES.UNKNOWN_ERROR)
       setDeletingUserId(null)
