@@ -28,9 +28,8 @@ class ProtobufService {
       
       this.isInitialized = true
       
-      console.log('✅ Protocol Buffer initialized successfully')
     } catch (error) {
-      console.error('❌ Failed to initialize Protocol Buffer:', error)
+      console.error(' Failed to initialize Protocol Buffer:', error)
       throw error
     }
   }
@@ -84,8 +83,7 @@ class ProtobufService {
         // Note: safe logging only first user keys and previews
         if (decoded && Array.isArray(decoded.users) && decoded.users.length > 0) {
           const u = decoded.users[0]
-          console.log('🔎 Decoded raw user[0] keys:', Object.keys(u))
-          console.log('🔎 Decoded raw user[0] previews:', {
+          console.log(' Decoded raw user[0] previews:', {
             id: u.id,
             email: u.email,
             created_at: (u as any).created_at,
@@ -109,13 +107,6 @@ class ProtobufService {
         signature: user.signature || ''
       }))
 
-      console.log('✅ Protocol Buffer decoded successfully', {
-        userCount: users.length,
-        totalCount: decoded.total_count,
-        exportedAt: decoded.exported_at,
-        algorithm: decoded.algorithm,
-        hashAlgorithm: decoded.hash_algorithm
-      })
 
       return {
         users,
@@ -126,7 +117,7 @@ class ProtobufService {
       }
 
     } catch (error) {
-      console.error('❌ Failed to decode Protocol Buffer:', error)
+      console.error('Failed to decode Protocol Buffer:', error)
       throw error
     }
   }
@@ -168,13 +159,10 @@ class ProtobufService {
         email_hash: decoded.email_hash || decoded.emailHash || '',
         signature: decoded.signature || ''
       }
-
-      console.log('✅ Single user decoded successfully', { userId: user.id })
-
       return user
 
     } catch (error) {
-      console.error('❌ Failed to decode single user:', error)
+      console.error('Failed to decode single user:', error)
       throw error
     }
   }

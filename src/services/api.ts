@@ -16,18 +16,14 @@ class ApiService {
       },
     })
 
-    // Enhanced request interceptor
     this.api.interceptors.request.use(
       (config) => {
-        // Add auth token if available
         const token = localStorage.getItem('authToken')
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`
         }
         
-        // Log request in development
         if (import.meta.env.DEV) {
-          console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`)
         }
         return config
       },
@@ -42,7 +38,6 @@ class ApiService {
       (response: AxiosResponse) => {
         // Log successful response in development
         if (import.meta.env.DEV) {
-          console.log(`✅ API Response: ${response.status} ${response.config.url}`)
         }
         return response
       },
@@ -51,7 +46,7 @@ class ApiService {
         const errorMessage = this.getErrorMessage(error)
         
         if (import.meta.env.DEV) {
-          console.error('❌ API Error:', {
+          console.error(' API Error:', {
             status: error.response?.status,
             message: errorMessage,
             url: error.config?.url,
@@ -289,7 +284,6 @@ class ApiService {
         if (error.response?.status === 429 && attempt < maxRetries) {
           // Rate limited - wait with exponential backoff
           const delay = Math.pow(2, attempt) * 1000 // 2s, 4s, 8s
-          console.log(`Rate limited, retrying in ${delay}ms... (attempt ${attempt}/${maxRetries})`)
           await new Promise(resolve => setTimeout(resolve, delay))
           continue
         }
@@ -302,7 +296,6 @@ class ApiService {
   // Cached request to prevent duplicate calls
   private async cachedRequest<T>(key: string, requestFn: () => Promise<T>): Promise<T> {
     if (this.requestCache.has(key)) {
-      console.log(`Using cached request for ${key}`)
       return this.requestCache.get(key)!
     }
 
