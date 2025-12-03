@@ -1,8 +1,23 @@
 {
   "rewrites": [
     {
+      "source": "/(.*\\.proto)",
+      "destination": "/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*\\.proto)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain"
+        }
+      ]
     }
   ]
 }
