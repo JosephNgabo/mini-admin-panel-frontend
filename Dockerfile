@@ -17,7 +17,11 @@ FROM nginx:alpine
 # Remove default nginx index
 RUN rm -rf /usr/share/nginx/html/*
 
+# Copy built files
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+
+# Copy nginx configuration for SPA routing
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
