@@ -2,6 +2,57 @@ import * as protobuf from 'protobufjs'
 import { User } from '../types'
 
 /**
+ * Protocol Buffer schema embedded as string
+ * This avoids HTTP loading issues in production/Docker
+ */
+const PROTO_SCHEMA = `
+syntax = "proto3";
+
+package user;
+
+// User message definition
+// This defines the structure for serializing user data
+message User {
+  // Unique identifier for the user
+  string id = 1;
+  
+  // User's email address
+  string email = 2;
+  
+  // User's role (admin, user, moderator)
+  string role = 3;
+  
+  // User's status (active, inactive)
+  string status = 4;
+  
+  // Timestamp when user was created
+  string created_at = 5;
+  
+  // SHA-384 hash of the email for data integrity
+  string email_hash = 6;
+  
+  // RSA digital signature for authentication
+  string signature = 7;
+}
+
+// Collection of users for export
+message UserCollection {
+  // List of users
+  repeated User users = 1;
+  
+  // Total count of users
+  int32 total_count = 2;
+  
+  // Export timestamp
+  string exported_at = 3;
+  
+  // Export metadata
+  string algorithm = 4;        // RSA-2048
+  string hash_algorithm = 5;   // SHA-384
+}
+`
+
+/**
  * Protocol Buffer Service for Frontend
  * Handles decoding of protobuf data received from backend
  */
@@ -19,12 +70,22 @@ class ProtobufService {
    */
   private async initializeProtobuf() {
     try {
-      // Load the proto file
-      const root = await protobuf.load('/user.proto')
+      // Parse the embedded proto schema instead of loading from HTTP
+      // This works in all environments (Vercel, Docker, local dev)
+      // protobuf.parse() returns an object with a 'root' property
+      const parsed = protobuf.parse(PROTO_SCHEMA, { keepCase: true })
+      const root = parsed.root || parsed
+      
+      // Resolve all types
+      root.resolveAll()
       
       // Get message types
       this.UserMessage = root.lookupType('user.User')
       this.UserCollectionMessage = root.lookupType('user.UserCollection')
+      
+      if (!this.UserMessage || !this.UserCollectionMessage) {
+        throw new Error('Failed to load Protocol Buffer message types')
+      }
       
       this.isInitialized = true
       
